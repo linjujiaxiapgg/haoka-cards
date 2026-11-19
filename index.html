@@ -2,325 +2,415 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>号卡筛选助手</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>有佳卡号卡精选助手</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--bg:#0e1014;--panel:#181b22;--panel2:#22262f;--line:rgba(255,255,255,.06);
+--text:#e9ecf1;--sub:#8b94a7;--primary:#7b61ff;--primary2:#a58bff;
+--ok:#26c281;--danger:#ff6b6b;--price:#ff5f6d;--flow:#4dabf7;--call:#51cf66;
+}
 html,body{width:100%;max-width:100%;overflow-x:hidden}
-body{background:#f2f4f8;color:#1f2329;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;padding-bottom:24px}
-.header{background:linear-gradient(135deg,#0f52d9,#3d8bfd);color:#fff;padding:18px 16px 16px}
-.header-row{display:flex;align-items:center;justify-content:space-between}
-.header h1{font-size:19px;font-weight:700;letter-spacing:.5px}
-.status{font-size:11px;background:rgba(255,255,255,.18);padding:4px 9px;border-radius:20px;white-space:nowrap}
-.header-sub{font-size:12px;opacity:.88;margin-top:6px}
-.toolbar{background:#fff;padding:12px 16px 14px;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(15,40,90,.07)}
-.search-box{position:relative;margin-bottom:10px}
-.search-box input{width:100%;padding:11px 14px 11px 36px;border:1px solid #e3e6eb;background:#f7f8fa;border-radius:10px;font-size:14px;outline:none;transition:.2s}
-.search-box input:focus{border-color:#3d8bfd;background:#fff;box-shadow:0 0 0 3px rgba(61,139,253,.12)}
-.search-box .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.5}
-.filter-row{display:flex;gap:8px;align-items:center}
-.select-wrap{flex:1;min-width:0;position:relative}
-.select-wrap select{width:100%;min-width:0;appearance:none;padding:9px 26px 9px 11px;border:1px solid #e3e6eb;border-radius:9px;background:#fff;font-size:13.5px;color:#1f2329;outline:none;text-overflow:ellipsis}
-.select-wrap::after{content:"▾";position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:#8a9099;pointer-events:none}
-.loc-btn{flex:0 0 auto;max-width:38%;padding:8px 10px;border:none;border-radius:9px;background:#0f52d9;color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-.loc-btn.on{background:#e8f0ff;color:#0f52d9}
-.filter-row2{display:flex;gap:8px;align-items:center;margin-top:8px}
-.price-box{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:#f7f8fa;border:1px solid #e3e6eb;border-radius:9px;padding:8px 11px;font-size:12.5px;color:#5a6373}
-.price-box input[type=range]{flex:1;min-width:0;width:100%;accent-color:#0f52d9;height:18px}
-.price-box b{color:#0f52d9;font-size:13px;min-width:44px;text-align:right}
-.op-box{flex:0 0 auto;width:112px;max-width:34%}
-.summary{padding:10px 16px 2px;font-size:12px;color:#6b7280;line-height:1.6}
-.summary b{color:#0f52d9}
-.list{padding:10px 12px 0;display:grid;gap:11px}
-.card{width:100%;max-width:100%;background:#fff;border-radius:14px;padding:14px 15px 12px;box-shadow:0 2px 10px rgba(20,40,80,.06);position:relative;overflow:hidden}
-.card.local::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#ff5a5f,#ff8a3d)}
-.name-row{display:flex;align-items:center;gap:7px;margin-bottom:14px}
-.card-name{font-size:19px;font-weight:700;color:#14181f;letter-spacing:.3px;line-height:1.3}
-.badge{font-size:10.5px;font-weight:700;padding:3px 7px;border-radius:5px;white-space:nowrap}
-.badge.local{background:#fff0ec;color:#e8453c}
-.badge.nation{background:#eaf6ec;color:#1a9c4a}
-.badge.partial{background:#f0f0f5;color:#6b7280}
-.badge.op{background:#eef4ff;color:#0f52d9}
-/* 第二排：三列大字 */
-.highlight{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:6px;text-align:center;padding:10px 4px 12px;background:#f8fafd;border-radius:11px;margin-bottom:12px}
-.hl .num{font-size:25px;font-weight:800;line-height:1.15;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
-.hl .num.price{color:#e8453c}
-.hl .num.flow{color:#0f52d9}
-.hl .num.call{color:#12a150}
-.hl .num small{font-size:12px;font-weight:700;margin-left:1px}
-.hl .label{font-size:11.5px;color:#8a9099;margin-top:5px;font-weight:500}
-/* 第三排：可发地/年龄/首充 加粗加大 */
-.info-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:12px}
-.info-chip{display:flex;flex-direction:column;justify-content:center;gap:3px;background:#f5f7fb;border:1px solid #e9edf3;border-radius:9px;padding:7px 9px;min-width:0}
-.info-chip .k{font-size:10.5px;color:#8a9099;font-weight:500;white-space:nowrap}
-.info-chip .v{font-size:16px;font-weight:800;color:#1f2329;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.info-chip.local-chip{background:#fff7f3;border-color:#ffd9c9}
-.info-chip.local-chip .v{color:#d63a30}
-.note{font-size:11.5px;color:#8a9099;line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px dashed #eceff4}
-.act{flex:1;min-width:0;font-size:11.5px;color:#8a9099;line-height:1.4}
-.act b{color:#5a6373;font-weight:600}
-.go{flex:0 0 auto;padding:9px 20px;border-radius:22px;background:linear-gradient(135deg,#0f52d9,#3d8bfd);color:#fff;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap;box-shadow:0 4px 10px rgba(15,82,217,.22)}
-.empty{text-align:center;padding:64px 24px;color:#8a9099;font-size:13.5px;line-height:1.9}
-.empty .big{font-size:40px;display:block;margin-bottom:10px;opacity:.35}
-.loading{text-align:center;padding:56px;color:#8a9099;font-size:13.5px}
-.spinner{width:26px;height:26px;border:3px solid #e3e6eb;border-top-color:#0f52d9;border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.footer{text-align:center;font-size:11px;color:#a8afb8;padding:22px 16px 6px;line-height:1.8}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;padding-bottom:28px}
+.wrap{max-width:560px;margin:0 auto}
+/* 头部 */
+.top{padding:18px 16px 10px;display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;gap:11px;align-items:center}
+.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#b197fc,#6c4dff);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;box-shadow:0 6px 18px rgba(123,97,255,.35)}
+.brand h1{font-size:19px;font-weight:800;letter-spacing:.3px;line-height:1.25}
+.brand .sub{font-size:12px;color:var(--sub);margin-top:3px}
+.dateChip{padding:6px 11px;border-radius:20px;background:rgba(38,194,129,.14);color:var(--ok);font-size:12px;font-weight:600;white-space:nowrap}
+/* tabs */
+.tabs{margin:6px 16px 14px;background:var(--panel);border-radius:14px;padding:5px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.tab{padding:11px 0;text-align:center;font-size:15px;font-weight:600;color:var(--sub);border-radius:10px;cursor:pointer;transition:.18s}
+.tab.on{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;box-shadow:0 6px 18px rgba(123,97,255,.35)}
+/* 筛选面板 */
+.panel{margin:0 16px 12px;background:var(--panel);border-radius:18px;padding:14px 14px 16px}
+.row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.row:last-child{margin-bottom:0}
+.k{width:44px;flex:0 0 44px;font-size:13px;color:var(--sub)}
+.main{flex:1;min-width:0}
+select,.inp{width:100%;min-width:0;padding:12px 13px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:15px;outline:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,#8b94a7 50%),linear-gradient(135deg,#8b94a7 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.locBtn{padding:12px 12px;border-radius:12px;background:rgba(38,194,129,.12);border:1px solid rgba(38,194,129,.3);color:var(--ok);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.locBtn.off{background:var(--panel2);border-color:var(--line);color:var(--sub)}
+.ageRow{display:flex;gap:8px}
+.ageNo{padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;font-size:13px;font-weight:700;cursor:pointer;flex:0 0 auto}
+/* 四大运营商 */
+.ops{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.op{padding:16px 0;text-align:center;border-radius:14px;background:var(--panel2);border:1px solid var(--line);color:var(--sub);font-size:18px;font-weight:800;cursor:pointer;transition:.18s;letter-spacing:.5px}
+.op.on{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-color:transparent;box-shadow:0 6px 20px rgba(123,97,255,.4)}
+/* 渠道 */
+.chans{display:flex;flex-wrap:wrap;gap:8px}
+.chan{padding:10px 13px;border-radius:11px;background:var(--panel2);border:1px solid var(--line);color:var(--sub);font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s}
+.chan.on{background:rgba(123,97,255,.16);border-color:rgba(123,97,255,.5);color:var(--primary2)}
+.chan b{font-size:11px;opacity:.8;margin-left:3px}
+/* 月租 */
+.pw{display:flex;align-items:center;gap:10px}
+input[type=range]{flex:1;min-width:0;height:22px;background:transparent;-webkit-appearance:none;accent-color:var(--primary)}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:3px;background:var(--panel2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--primary);border:3px solid #fff;margin-top:-9px;box-shadow:0 2px 8px rgba(123,97,255,.6)}
+.pv{width:58px;text-align:right;font-size:13.5px;color:var(--sub);flex:0 0 58px}
+/* 结果 */
+.tip{padding:4px 18px 8px;font-size:12px;color:var(--sub)}
+.list{padding:0 16px;display:grid;gap:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 15px 13px;position:relative;overflow:hidden}
+.card.mine::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#ff5f6d,#ff9f43)}
+.nameRow{display:flex;align-items:center;gap:7px;margin-bottom:13px;flex-wrap:wrap}
+.name{font-size:19px;font-weight:800;line-height:1.3}
+.bd{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.bd.mine{background:rgba(255,95,109,.15);color:#ff8a92}
+.bd.nat{background:rgba(38,194,129,.14);color:var(--ok)}
+.bd.part{background:var(--panel2);color:var(--sub)}
+.bd.op{background:rgba(77,171,247,.14);color:var(--flow)}
+/* 第二排大字 */
+.hl{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:6px;text-align:center;background:#141820;border-radius:12px;padding:11px 4px 12px;margin-bottom:12px}
+.hl .n{font-size:26px;font-weight:800;line-height:1.15;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.hl .n.p{color:var(--price)}.hl .n.f{color:var(--flow)}.hl .n.c{color:var(--call)}
+.hl .n small{font-size:12px;font-weight:700;margin-left:1px}
+.hl .l{font-size:11.5px;color:var(--sub);margin-top:5px}
+/* 第三排 */
+.info{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:11px}
+.chip{background:#141820;border:1px solid var(--line);border-radius:10px;padding:8px 9px;min-width:0}
+.chip.mine{background:rgba(255,95,109,.09);border-color:rgba(255,95,109,.25)}
+.chip .ck{font-size:10.5px;color:var(--sub);white-space:nowrap}
+.chip .cv{font-size:16px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip.mine .cv{color:#ff8a92}
+.note{font-size:11.5px;color:var(--sub);line-height:1.55;margin-bottom:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:11px;border-top:1px solid var(--line)}
+.act{flex:1;min-width:0;font-size:11.5px;color:var(--sub);line-height:1.5}
+.act b{color:#7f8ca0;font-weight:600}
+.wxBtn{flex:0 0 auto;padding:10px 18px;border:none;border-radius:24px;background:linear-gradient(135deg,#1aad19,#0f8f0e);color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 5px 14px rgba(26,173,25,.28);display:flex;align-items:center;gap:5px}
+.wxBtn:active{transform:scale(.97)}
+.empty{text-align:center;padding:60px 24px;color:var(--sub);font-size:13.5px;line-height:1.9}
+.empty .big{font-size:38px;display:block;margin-bottom:10px;opacity:.4}
+.loading{text-align:center;padding:50px;color:var(--sub);font-size:13.5px}
+.footNote{text-align:center;font-size:11px;color:#6f7889;padding:20px 18px 4px;line-height:1.9}
+/* toast */
+.toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%) translateY(20px);background:rgba(24,27,34,.96);border:1px solid var(--line);color:#e9ecf1;padding:12px 18px;border-radius:12px;font-size:13.5px;line-height:1.5;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:86%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="header-row">
-    <h1>号卡筛选助手</h1>
-    <span class="status" id="dataStatus">加载中…</span>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <div class="logo">有</div>
+      <div>
+        <h1>有佳卡号卡精选助手</h1>
+        <div class="sub">可发地区 · 年龄 · 月租 · 渠道 一筛即得</div>
+      </div>
+    </div>
+    <div class="dateChip" id="dateChip">本地数据</div>
   </div>
-  <div class="header-sub">本省专属优先 · 全国紧随其后 · 外省自动隐藏</div>
-</div>
 
-<div class="toolbar">
-  <div class="search-box">
-    <span class="icon">🔍</span>
-    <input type="text" id="searchInput" placeholder="搜索卡名 / 运营商 / 流量 / 标签">
+  <div class="tabs">
+    <div class="tab on" data-tab="flow">流量卡</div>
+    <div class="tab" data-tab="broadband">宽带</div>
+    <div class="tab" data-tab="all">全部</div>
   </div>
-  <div class="filter-row">
-    <div class="select-wrap">
-      <select id="provinceSelect"></select>
-    </div>
-    <button class="loc-btn" id="locBtn" onclick="locate()">定位本省</button>
-  </div>
-  <div class="filter-row2">
-    <div class="price-box">
-      <span>月租 ≤</span>
-      <input type="range" id="priceRange" min="19" max="99" value="99" step="1">
-      <b id="priceLabel">不限</b>
-    </div>
-    <div class="select-wrap op-box">
-      <select id="operatorSelect">
-        <option value="">全部运营商</option>
-        <option value="移动">中国移动</option>
-        <option value="联通">中国联通</option>
-        <option value="电信">中国电信</option>
-        <option value="广电">中国广电</option>
-      </select>
-    </div>
-  </div>
-</div>
 
-<div class="summary" id="summary"></div>
-<div class="list" id="list"><div class="loading"><div class="spinner"></div>正在获取最新卡品数据…</div></div>
-<div class="footer">数据来自号卡宇宙店铺，每次打开页面自动拉取最新版本<br>最终套餐以渠道页面与运营商审核为准</div>
+  <div class="panel">
+    <div class="row">
+      <div class="k">省份</div>
+      <div class="main"><select id="prov"></select></div>
+      <div class="locBtn off" id="locBtn" onclick="locate()">定位</div>
+    </div>
+
+    <div class="row">
+      <div class="k">年龄</div>
+      <div class="main">
+        <div class="ageRow">
+          <input class="inp" type="number" id="age" placeholder="输入周岁，如 25">
+          <div class="ageNo" onclick="clearAge()">不限</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="k">运营</div>
+      <div class="main">
+        <div class="ops" id="ops">
+          <div class="op on" data-op="移动">移动</div>
+          <div class="op on" data-op="联通">联通</div>
+          <div class="op on" data-op="电信">电信</div>
+          <div class="op on" data-op="广电">广电</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="k">渠道</div>
+      <div class="main"><div class="chans" id="chans"></div></div>
+    </div>
+
+    <div class="row">
+      <div class="k">月租</div>
+      <div class="main">
+        <div class="pw">
+          <input type="range" id="price" min="19" max="100" value="100">
+          <div class="pv" id="pv">≤100元</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="k">搜索</div>
+      <div class="main"><input class="inp" type="text" id="q" placeholder="卡名 / 备注关键词，如 全国、陕西"></div>
+    </div>
+  </div>
+
+  <div class="tip" id="tip"></div>
+  <div class="list" id="list"><div class="loading">正在载入本地卡品数据…</div></div>
+  <div class="footNote">本地数据 · 无需联网<br>套餐与审核以运营商及渠道最终结果为准</div>
+</div>
+<div class="toast" id="toast"></div>
 
 <script>
+const DATA = [{"name":"广电小津卡","operator":"广电","price":19,"general":180,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"浩卡联盟","type":"流量卡","note":"收货地即归属地，仅发天津，激活强充","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通庆瑶卡（仅发重庆）","operator":"联通","price":19,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["重庆"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发重庆；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电钟楼卡","operator":"广电","price":20,"general":120,"direct":30,"call":200,"ageMin":18,"ageMax":35,"province":["陕西"],"channel":"宸宇","type":"流量卡","note":"240元包年=每月20元；长期套餐，只发陕西","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电江西卡","operator":"广电","price":28,"general":320,"direct":30,"call":200,"ageMin":18,"ageMax":35,"province":["江西"],"channel":"卡世界","type":"流量卡","note":"江西专属；菜鸟快递上门激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电将星卡","operator":"广电","price":28,"general":320,"direct":30,"call":200,"ageMin":18,"ageMax":35,"province":["北京","天津","河北","山西","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-35；激活发货；全国可发；随机归属；前3月无语音","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电江星卡（仅发江西）","operator":"广电","price":28,"general":320,"direct":30,"call":200,"ageMin":18,"ageMax":35,"province":["江西"],"channel":"号卡宇宙","type":"流量卡","note":"18-35；上门激活；仅发江西","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电绿泽卡（仅发湖北）","operator":"广电","price":28,"general":320,"direct":30,"call":200,"ageMin":18,"ageMax":35,"province":["湖北"],"channel":"号卡宇宙","type":"流量卡","note":"18-35；上门激活；仅发湖北","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电江梦卡","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["部分地区"],"channel":"宸宇","type":"流量卡","note":"0.15元/分钟；禁公域宣传（小红书/抖音等）","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通大重卡","operator":"联通","price":29,"general":100,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["重庆"],"channel":"宸宇","type":"流量卡","note":"仅发重庆，须一次性首充100元","firstRecharge":"100元","commissionLevel":1},{"name":"广电时光卡","operator":"广电","price":29,"general":100,"direct":0,"call":100,"ageMin":18,"ageMax":35,"province":["陕西"],"channel":"宸宇","type":"流量卡","note":"长期套餐，只发陕西","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通南海卡","operator":"联通","price":29,"general":110,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["海南"],"channel":"宸宇","type":"流量卡","note":"只发海南，上门激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电长安卡","operator":"广电","price":29,"general":100,"direct":0,"call":100,"ageMin":18,"ageMax":35,"province":["陕西"],"channel":"浩卡联盟","type":"流量卡","note":"可开副卡，流量可结转，快递员激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通小川卡","operator":"联通","price":29,"general":280,"direct":0,"call":200,"ageMin":18,"ageMax":30,"province":["四川"],"channel":"浩卡联盟","type":"流量卡","note":"会员权益N选1；只发四川，快递激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电三清卡","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["江西"],"channel":"浩卡联盟","type":"流量卡","note":"0.15元/分钟；可开副卡，只发江西","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电大津卡","operator":"广电","price":29,"general":230,"direct":0,"call":250,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"浩卡联盟","type":"流量卡","note":"收货地即归属地，仅发天津，激活强充","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电阳光卡","operator":"广电","price":29,"general":200,"direct":0,"call":200,"ageMin":18,"ageMax":65,"province":["贵州"],"channel":"浩卡联盟","type":"流量卡","note":"只发贵阳，需自行领取流量","firstRecharge":"激活时充","commissionLevel":1},{"name":"1117广电卿羽卡","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["北京","天津","河北","山西","辽宁","吉林","黑龙江","上海","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；随机归属；长期套餐；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通硕果卡","operator":"联通","price":29,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-28；激活发货；全国可发；会员N选1；急单勿下；预存200元","firstRecharge":"200元","commissionLevel":1},{"name":"广电卿羽卡","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["北京","天津","河北","山西","辽宁","吉林","黑龙江","上海","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；随机归属；长期套餐；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通扶摇卡","operator":"联通","price":29,"general":100,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["天津","河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；激活发货；全国可发；长期套餐；预存120元","firstRecharge":"120元","commissionLevel":1},{"name":"联通洛尘卡","operator":"联通","price":29,"general":150,"direct":0,"call":400,"ageMin":18,"ageMax":30,"province":["河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","山东","河南","湖北","湖南","广西","海南","重庆","四川","贵州","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-30；激活发货；全国可发；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电奔余卡（本地归属）","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["吉林","安徽","江西","山东","湖北","湖南","广西","重庆","四川","贵州","云南","陕西","甘肃"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；本地归属；仅发13省","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电青花卡（部分省份）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["江苏","河南","广东"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发江苏河南广东；无语音功能","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电江明卡（仅发江西）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["江西"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发江西；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电川奔卡（仅发湖北）","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["湖北"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发湖北；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通北夏卡（仅发湖北）","operator":"联通","price":29,"general":180,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["湖北"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发湖北；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电川奔卡（仅发湖南）","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["湖南"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发湖南；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电西门卡（仅发广西）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广西"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发广西；仅发私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通海洋卡（仅发海南）","operator":"联通","price":29,"general":110,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["海南"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发海南","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通川烟卡（仅发四川）","operator":"联通","price":29,"general":280,"direct":0,"call":200,"ageMin":17,"ageMax":30,"province":["四川"],"channel":"号卡宇宙","type":"流量卡","note":"18-30；上门激活；仅发四川；会员N选1；次月生效","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电川奔卡（仅发四川）","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["四川"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发四川；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电秦广卡（仅发陕西）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["陕西"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发陕西；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电甘青卡（仅发甘肃）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":23,"ageMax":65,"province":["甘肃"],"channel":"号卡宇宙","type":"流量卡","note":"23-65；上门激活；仅发甘肃；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"天津电信单宽带200M","operator":"电信","price":30,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"宸宇","type":"宽带","note":"360元/年，上门安装；360元/年","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电雪青卡","operator":"广电","price":38,"general":160,"direct":30,"call":300,"ageMin":18,"ageMax":35,"province":["陕西"],"channel":"宸宇","type":"流量卡","note":"只发陕西部分地区","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信山克卡（仅发山东）","operator":"电信","price":38,"general":190,"direct":0,"call":300,"ageMin":18,"ageMax":65,"province":["山东"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发山东；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通将军卡","operator":"联通","price":39,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["重庆"],"channel":"宸宇","type":"流量卡","note":"上门激活，仅私域宣传","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信万圣卡","operator":"电信","price":39,"general":200,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["河北"],"channel":"宸宇","type":"流量卡","note":"仅发河北石家庄，仅私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"移动菲菲卡","operator":"移动","price":39,"general":160,"direct":0,"call":100,"ageMin":18,"ageMax":28,"province":["安徽"],"channel":"宸宇","type":"流量卡","note":"含100条短信；4年套餐，仅发合肥","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通念可卡","operator":"联通","price":39,"general":60,"direct":0,"call":50,"ageMin":18,"ageMax":60,"province":["四川"],"channel":"宸宇","type":"流量卡","note":"仅发四川，实际到账流量240G","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通之翼卡","operator":"联通","price":39,"general":60,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["重庆"],"channel":"宸宇","type":"流量卡","note":"只发重庆，实际到账流量200G","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电吉利卡","operator":"广电","price":39,"general":60,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["吉林"],"channel":"宸宇","type":"流量卡","note":"仅发吉林，上门激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信高邮卡","operator":"电信","price":39,"general":110,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["江苏"],"channel":"卡世界","type":"流量卡","note":"江苏专属；京东/顺丰/EMS上门激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电奔马卡","operator":"广电","price":39,"general":60,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["陕西"],"channel":"浩卡联盟","type":"流量卡","note":"收货地即归属地，只发陕西","firstRecharge":"激活时充","commissionLevel":1},{"name":"移动江白卡","operator":"移动","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["江西"],"channel":"浩卡联盟","type":"流量卡","note":"长期套餐，只发江西","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通大川卡","operator":"联通","price":39,"general":550,"direct":0,"call":300,"ageMin":18,"ageMax":30,"province":["四川"],"channel":"浩卡联盟","type":"流量卡","note":"会员权益N选1；只发四川，快递激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信云朵卡","operator":"电信","price":39,"general":140,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广东"],"channel":"浩卡联盟","type":"流量卡","note":"0.15元/分钟；只发广东，2年优惠，上门激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信江河卡","operator":"电信","price":39,"general":110,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["江苏"],"channel":"浩卡联盟","type":"流量卡","note":"只发省内（江苏），第三上门激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信时空卡","operator":"电信","price":39,"general":160,"direct":0,"call":100,"ageMin":18,"ageMax":30,"province":["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","陕西","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-30；激活发货；可发全国；极速发货；到期可续；预存100元","firstRecharge":"100元","commissionLevel":1},{"name":"联通湖图卡","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-28；激活发货；全国可发；长期流量；4年会员；预存200元","firstRecharge":"200元","commissionLevel":1},{"name":"1117联通飞鹤卡","operator":"联通","price":39,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["天津","河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","陕西","甘肃","青海"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；激活发货；全国可发；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通落枫卡（低龄版本）","operator":"联通","price":39,"general":220,"direct":0,"call":250,"ageMin":18,"ageMax":30,"province":["天津","河北","山西","内蒙古","上海","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","重庆","陕西","甘肃","青海"],"channel":"号卡宇宙","type":"流量卡","note":"18-30；激活发货；全国可发；长期套餐；5天发货；预存100元","firstRecharge":"100元","commissionLevel":1},{"name":"联通落枫卡（高龄版本）","operator":"联通","price":39,"general":220,"direct":0,"call":250,"ageMin":31,"ageMax":60,"province":["天津","河北","山西","内蒙古","上海","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","重庆","陕西","甘肃","青海"],"channel":"号卡宇宙","type":"流量卡","note":"31-60；激活发货；全国可发；长期套餐；5天发货；预存100元","firstRecharge":"100元","commissionLevel":1},{"name":"联通飞鹤卡","operator":"联通","price":39,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["天津","河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","陕西","甘肃","青海"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；激活发货；全国可发；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通多行卡","operator":"联通","price":39,"general":240,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","山东","湖北","湖南","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；激活发货；全国可发；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通幻蜀卡","operator":"联通","price":39,"general":235,"direct":0,"call":200,"ageMin":18,"ageMax":30,"province":["河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","山东","湖北","湖南","广西","海南","重庆","四川","贵州","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-30；激活发货；可发全国；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信苏雨卡（仅发江苏）","operator":"电信","price":39,"general":110,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["江苏"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发江苏；全省可发","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通福清卡（仅发福建）","operator":"联通","price":39,"general":100,"direct":110,"call":300,"ageMin":18,"ageMax":27,"province":["福建"],"channel":"号卡宇宙","type":"流量卡","note":"18-27；上门激活；仅发福建","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通江烈卡（仅发江西）","operator":"联通","price":39,"general":145,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["江西"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发江西；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"移动江白卡（仅发江西）","operator":"移动","price":39,"general":120,"direct":30,"call":200,"ageMin":18,"ageMax":60,"province":["江西"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发江西；长期套餐","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通北秋卡（仅发湖北）","operator":"联通","price":39,"general":180,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["湖北"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发湖北；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信北春卡（仅发湖北）","operator":"电信","price":39,"general":150,"direct":30,"call":200,"ageMin":21,"ageMax":60,"province":["湖北"],"channel":"号卡宇宙","type":"流量卡","note":"21-60；上门激活；仅发湖北；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通乐湖卡（仅发湖南）","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["湖南"],"channel":"号卡宇宙","type":"流量卡","note":"18-28；自主激活；仅发湖南；会员N选1","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通东烈卡（仅发广东）","operator":"联通","price":39,"general":85,"direct":0,"call":0,"ageMin":18,"ageMax":59,"province":["广东"],"channel":"号卡宇宙","type":"流量卡","note":"18-59；上门激活；仅发广东；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"1117电信东形卡（仅发广东）","operator":"电信","price":39,"general":140,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广东"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发广东；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信东形卡（仅发广东）","operator":"电信","price":39,"general":140,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广东"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发广东；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通庆枝卡（仅发重庆）","operator":"联通","price":39,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["重庆"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发重庆；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通川域卡（仅发四川）","operator":"联通","price":39,"general":550,"direct":0,"call":300,"ageMin":18,"ageMax":30,"province":["四川"],"channel":"号卡宇宙","type":"流量卡","note":"18-30；上门激活；仅发四川；会员N选1；次月生效","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通川雅卡（仅发四川）","operator":"联通","price":39,"general":240,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["四川"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发四川","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通浅眠卡（高龄版本）","operator":"联通","price":40,"general":290,"direct":0,"call":200,"ageMin":30,"ageMax":60,"province":["河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","山东","湖北","湖南","广西","海南","重庆","四川","贵州","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"30-60；激活发货；全国可发；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"联通浅眠卡","operator":"联通","price":40,"general":290,"direct":0,"call":200,"ageMin":18,"ageMax":30,"province":["河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","山东","湖北","湖南","广西","海南","重庆","四川","贵州","甘肃","青海","宁夏"],"channel":"号卡宇宙","type":"流量卡","note":"18-30；激活发货；全国可发；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信山涧卡（仅发山东）","operator":"电信","price":40,"general":310,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["山东"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发山东；部分市区","firstRecharge":"激活时充","commissionLevel":1},{"name":"浙江移动单宽带300M","operator":"移动","price":40,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["浙江"],"channel":"宸宇","type":"宽带","note":"960元/两年，上门安装；960元/两年","firstRecharge":"激活时充","commissionLevel":1},{"name":"广电奔贺卡（仅发河南）","operator":"广电","price":41,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["河南"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；上门激活；仅发河南；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信白云卡","operator":"电信","price":49,"general":170,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广东"],"channel":"浩卡联盟","type":"流量卡","note":"0.15元/分钟；只发广东，2年优惠，上门激活","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信东茗卡（仅发广东）","operator":"电信","price":49,"general":170,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广东"],"channel":"号卡宇宙","type":"流量卡","note":"18-65；上门激活；仅发广东；仅限私域","firstRecharge":"激活时充","commissionLevel":1},{"name":"天津电信单宽带300M","operator":"电信","price":50,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"宸宇","type":"宽带","note":"600元/年，上门安装；600元/年","firstRecharge":"激活时充","commissionLevel":1},{"name":"北京移动单宽带300M","operator":"移动","price":57,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["北京"],"channel":"卡世界","type":"宽带","note":"680元/年，300Mbps，北京专属；680元/年","firstRecharge":"激活时充","commissionLevel":1},{"name":"天津电信单宽带500M","operator":"电信","price":75,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"宸宇","type":"宽带","note":"900元/年，上门安装；900元/年","firstRecharge":"激活时充","commissionLevel":1},{"name":"北京移动融合300M","operator":"移动","price":79,"general":20,"direct":0,"call":100,"ageMin":18,"ageMax":70,"province":["北京"],"channel":"宸宇","type":"宽带","note":"79元/月：300M+20G+100分钟；79元/月","firstRecharge":"激活时充","commissionLevel":1},{"name":"北京电信融合1000M","operator":"电信","price":99,"general":100,"direct":0,"call":1000,"ageMin":18,"ageMax":65,"province":["北京"],"channel":"卡世界","type":"宽带","note":"99元/月：1000Mbps+100G+1000分钟；99元/月","firstRecharge":"激活时充","commissionLevel":1},{"name":"天津联通单宽带300M","operator":"联通","price":99,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"宸宇","type":"宽带","note":"99元/月，上门安装；99元/月","firstRecharge":"激活时充","commissionLevel":1},{"name":"天津联通融合500M","operator":"联通","price":99,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"宸宇","type":"宽带","note":"99元/月，上门安装；99元/月","firstRecharge":"激活时充","commissionLevel":1},{"name":"天津联通单宽带500M","operator":"联通","price":129,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"宸宇","type":"宽带","note":"129元/月，上门安装；129元/月","firstRecharge":"激活时充","commissionLevel":1},{"name":"天津电信融合1000M","operator":"电信","price":139,"general":0,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["天津"],"channel":"宸宇","type":"宽带","note":"139元/月，上门安装；139元/月","firstRecharge":"激活时充","commissionLevel":1},{"name":"北京移动融合1000M","operator":"移动","price":139,"general":60,"direct":0,"call":200,"ageMin":18,"ageMax":70,"province":["北京"],"channel":"宸宇","type":"宽带","note":"139元/月：1000M+60G+200分钟；139元/月","firstRecharge":"激活时充","commissionLevel":1},{"name":"电信摄像卡","operator":"电信","price":29,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":26,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"改IP激活后发货；预存200元，有外呼","firstRecharge":"200元","commissionLevel":2},{"name":"联通听松卡","operator":"联通","price":29,"general":130,"direct":0,"call":200,"ageMin":18,"ageMax":27,"province":["全网"],"channel":"号卡宇宙","type":"流量卡","note":"18-27；激活发货；全国可发；会员N选1；预存200元","firstRecharge":"200元","commissionLevel":2},{"name":"移动胜途卡","operator":"移动","price":39,"general":200,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；激活发货；全国可发；需改IP；预存240元","firstRecharge":"240元","commissionLevel":2},{"name":"移动番茄卡","operator":"移动","price":40,"general":300,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"下单预存200话费；需传照片，联系客服激活后发货","firstRecharge":"200元","commissionLevel":2},{"name":"移动微光卡","operator":"移动","price":40,"general":300,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"号卡宇宙","type":"流量卡","note":"18-60；激活发货；全国可发；NFC1对1；预存250元","firstRecharge":"250元","commissionLevel":2},{"name":"广电奶牛卡2.0","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"0.15元/分钟；上门激活，随时下架","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电奶牛卡","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"0.15元/分钟；上门激活，仅私域宣传","firstRecharge":"激活时充","commissionLevel":3},{"name":"新广电奔腾卡","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"0.15元/分钟；上门激活，随时下架","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电广益卡","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"卡世界","type":"流量卡","note":"长期套餐；京东上门激活，严禁公域宣传","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电金蝉卡","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"卡世界","type":"流量卡","note":"直连移动基站，京东上门激活","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电广澜卡","operator":"广电","price":29,"general":230,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"卡世界","type":"流量卡","note":"菜鸟/京东上门激活","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电龙驹卡","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"卡世界","type":"流量卡","note":"长期套餐；京东上门激活，严禁公域宣传","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电福广卡","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"卡世界","type":"流量卡","note":"菜鸟/京东上门激活","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电飞花卡","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"172","type":"流量卡","note":"长期29元；菜鸟上门激活；无需照片、无需选号","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电飞花卡 2.0","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"172","type":"流量卡","note":"长期29元；菜鸟上门激活；无需照片、无需选号","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电飞花卡 3.0","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"172","type":"流量卡","note":"长期29元·禁区少；菜鸟上门激活；无需照片、无需选号","firstRecharge":"激活时充","commissionLevel":3},{"name":"移动奇迹卡","operator":"移动","price":39,"general":200,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"需传照片；联系客服激活后发货","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通靠谱卡","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"含会员权益N选1；激活首充后发货，随时下架","firstRecharge":"按渠道要求","commissionLevel":3},{"name":"联通杂耍卡(11.31)","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"先激活充值后发货，随时下架","firstRecharge":"激活时充","commissionLevel":3},{"name":"新广电奔马卡","operator":"广电","price":39,"general":60,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"宸宇","type":"流量卡","note":"收货地为归属地","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通畅达卡","operator":"联通","price":39,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"浩卡联盟","type":"流量卡","note":"先激活充值后发货；无需三照，仅私域","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通星湛卡","operator":"联通","price":39,"general":215,"direct":0,"call":200,"ageMin":18,"ageMax":30,"province":["全网"],"channel":"浩卡联盟","type":"流量卡","note":"先充值后发货，自主激活；已领取3.1万+","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通星湛卡(全国版)","operator":"联通","price":39,"general":215,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"浩卡联盟","type":"流量卡","note":"先充值后发货，自主激活；已领取4.3万+","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通枫叶卡","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["全网"],"channel":"浩卡联盟","type":"流量卡","note":"提交三证；会员权益N选1，仅私域","firstRecharge":"激活时充","commissionLevel":3},{"name":"广电正规卡","operator":"广电","price":39,"general":60,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["全网"],"channel":"浩卡联盟","type":"流量卡","note":"收货地即归属地；严禁超60G宣传、严禁转单","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通星笙卡","operator":"联通","price":39,"general":200,"direct":0,"call":200,"ageMin":18,"ageMax":30,"province":["全网"],"channel":"浩卡联盟","type":"流量卡","note":"先激活充值后发货，自主激活","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通知音卡","operator":"联通","price":39,"general":235,"direct":0,"call":200,"ageMin":18,"ageMax":30,"province":["全网"],"channel":"浩卡联盟","type":"流量卡","note":"自动续约，先激活充值后发货","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通高山卡","operator":"联通","price":39,"general":235,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"浩卡联盟","type":"流量卡","note":"自动续约，先激活充值后发货；已领取6.4万+","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通青苹卡","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["全网"],"channel":"号卡宇宙","type":"流量卡","note":"18-28；激活发货；全国可发；长期流量；1年会员","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通青峰卡","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["全网"],"channel":"号卡宇宙","type":"流量卡","note":"18-28；激活发货；全国可发；会员N选1","firstRecharge":"激活时充","commissionLevel":3},{"name":"联通联享卡","operator":"联通","price":49,"general":190,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["全网"],"channel":"卡世界","type":"流量卡","note":"京东/顺丰/邮政随机，自主激活","firstRecharge":"激活时充","commissionLevel":3}];
 const PROVINCES = ["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","西藏","陕西","甘肃","青海","宁夏","新疆"];
 
-/* 离线快照：仅在无法联网时兜底显示，联网状态下始终使用 cards.json 最新数据 */
-const DEFAULT_DATA = [{"name":"联通庆瑶卡","rawName":"联通庆瑶卡（仅发重庆）","operator":"联通","price":19,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["重庆"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发重庆；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电将星卡","rawName":"广电将星卡（随时下架）","operator":"广电","price":28,"general":320,"direct":30,"call":200,"ageMin":18,"ageMax":35,"province":["北京","天津","河北","山西","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"firstRecharge":"50元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-35；激活发货；全国可发；随机归属；前3月无语音","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电江星卡","rawName":"广电江星卡（仅发江西）","operator":"广电","price":28,"general":320,"direct":30,"call":200,"ageMin":18,"ageMax":35,"province":["江西"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-35；上门激活；仅发江西","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电绿泽卡","rawName":"广电绿泽卡（仅发湖北）","operator":"广电","price":28,"general":320,"direct":30,"call":200,"ageMin":18,"ageMax":35,"province":["湖北"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-35；上门激活；仅发湖北","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电卿羽卡","rawName":"1117广电卿羽卡（全国可发）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["北京","天津","河北","山西","辽宁","吉林","黑龙江","上海","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；随机归属；长期套餐；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通硕果卡","rawName":"联通硕果卡（激活发货）","operator":"联通","price":29,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"firstRecharge":"200元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-28；激活发货；全国可发；会员N选1；急单勿下","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电卿羽卡","rawName":"广电卿羽卡（全国可发）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["北京","天津","河北","山西","辽宁","吉林","黑龙江","上海","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；随机归属；长期套餐；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通扶摇卡","rawName":"联通扶摇卡（激活发货）","operator":"联通","price":29,"general":100,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["天津","河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"firstRecharge":"120元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；激活发货；全国可发；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通洛尘卡","rawName":"联通洛尘卡（激活发货）","operator":"联通","price":29,"general":150,"direct":0,"call":400,"ageMin":18,"ageMax":30,"province":["河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","山东","河南","湖北","湖南","广西","海南","重庆","四川","贵州","甘肃","青海","宁夏"],"firstRecharge":"50元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-30；激活发货；全国可发；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电奔余卡（本地归属）","rawName":"广电奔余卡（本地归属）","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["吉林","安徽","江西","山东","湖北","湖南","广西","重庆","四川","贵州","云南","陕西","甘肃"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；本地归属；仅发13省","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电青花卡","rawName":"广电青花卡（部分省份）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["江苏","河南","广东"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发江苏河南广东；无语音功能","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电江明卡","rawName":"广电江明卡（仅发江西）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["江西"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发江西；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电川奔卡","rawName":"广电川奔卡（仅发湖北）","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["湖北"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；仅发湖北；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通北夏卡","rawName":"联通北夏卡（仅发湖北）","operator":"联通","price":29,"general":180,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["湖北"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发湖北；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电川奔卡","rawName":"广电川奔卡（仅发湖南）","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["湖南"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；仅发湖南；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电西门卡","rawName":"广电西门卡（仅发广西）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广西"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发广西；仅发私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通海洋卡","rawName":"联通海洋卡（仅发海南）","operator":"联通","price":29,"general":110,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["海南"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发海南","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通川烟卡","rawName":"联通川烟卡（仅发四川）","operator":"联通","price":29,"general":280,"direct":0,"call":200,"ageMin":17,"ageMax":30,"province":["四川"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-30；上门激活；仅发四川；会员N选1；次月生效","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电川奔卡","rawName":"广电川奔卡（仅发四川）","operator":"广电","price":29,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["四川"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；仅发四川；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电秦广卡","rawName":"广电秦广卡（仅发陕西）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["陕西"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；仅发陕西；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电甘青卡","rawName":"广电甘青卡（仅发甘肃）","operator":"广电","price":29,"general":192,"direct":0,"call":0,"ageMin":23,"ageMax":65,"province":["甘肃"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"23-65；上门激活；仅发甘肃；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"电信山克卡","rawName":"电信山克卡（仅发山东）","operator":"电信","price":38,"general":190,"direct":0,"call":300,"ageMin":18,"ageMax":65,"province":["山东"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；仅发山东；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"电信时空卡","rawName":"电信时空卡（激活发货）","operator":"电信","price":39,"general":160,"direct":0,"call":100,"ageMin":18,"ageMax":30,"province":["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","陕西","甘肃","青海","宁夏"],"firstRecharge":"100元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-30；激活发货；可发全国；极速发货；到期可续","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通湖图卡","rawName":"联通湖图卡（激活发货）","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"firstRecharge":"200元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-28；激活发货；全国可发；长期流量；4年会员","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通飞鹤卡","rawName":"1117联通飞鹤卡（激活发货）","operator":"联通","price":39,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["天津","河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","陕西","甘肃","青海"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；激活发货；全国可发；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通落枫卡（低龄版本）","rawName":"联通落枫卡（低龄版本）","operator":"联通","price":39,"general":220,"direct":0,"call":250,"ageMin":18,"ageMax":30,"province":["天津","河北","山西","内蒙古","上海","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","重庆","陕西","甘肃","青海"],"firstRecharge":"100元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-30；激活发货；全国可发；长期套餐；5天发货","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通落枫卡（高龄版本）","rawName":"联通落枫卡（高龄版本）","operator":"联通","price":39,"general":220,"direct":0,"call":250,"ageMin":31,"ageMax":60,"province":["天津","河北","山西","内蒙古","上海","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","重庆","陕西","甘肃","青海"],"firstRecharge":"100元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"31-60；激活发货；全国可发；长期套餐；5天发货","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通飞鹤卡","rawName":"联通飞鹤卡（激活发货）","operator":"联通","price":39,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["天津","河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","陕西","甘肃","青海"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；激活发货；全国可发；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通多行卡","rawName":"联通多行卡（激活发货）","operator":"联通","price":39,"general":240,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建","山东","湖北","湖南","广东","广西","海南","重庆","四川","贵州","陕西","甘肃","青海","宁夏"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；激活发货；全国可发；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通幻蜀卡","rawName":"联通幻蜀卡（激活发货）","operator":"联通","price":39,"general":235,"direct":0,"call":200,"ageMin":18,"ageMax":30,"province":["河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","山东","湖北","湖南","广西","海南","重庆","四川","贵州","甘肃","青海","宁夏"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-30；激活发货；可发全国；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"电信苏雨卡","rawName":"电信苏雨卡（仅发江苏）","operator":"电信","price":39,"general":110,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["江苏"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发江苏；全省可发","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通福清卡","rawName":"联通福清卡（仅发福建）","operator":"联通","price":39,"general":100,"direct":110,"call":300,"ageMin":18,"ageMax":27,"province":["福建"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-27；上门激活；仅发福建","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"移动江白卡","rawName":"移动江白卡（仅发江西）","operator":"移动","price":39,"general":120,"direct":30,"call":200,"ageMin":18,"ageMax":60,"province":["江西"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发江西；长期套餐","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通北秋卡","rawName":"联通北秋卡（仅发湖北）","operator":"联通","price":39,"general":180,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["湖北"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发湖北；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"电信北春卡","rawName":"电信北春卡（仅发湖北）","operator":"电信","price":39,"general":150,"direct":30,"call":200,"ageMin":21,"ageMax":60,"province":["湖北"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"21-60；上门激活；仅发湖北；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通乐湖卡","rawName":"联通乐湖卡（仅发湖南）","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["湖南"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-28；自主激活；仅发湖南；会员N选1","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通东烈卡","rawName":"联通东烈卡（仅发广东）","operator":"联通","price":39,"general":85,"direct":0,"call":0,"ageMin":18,"ageMax":59,"province":["广东"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-59；上门激活；仅发广东；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"电信东形卡","rawName":"1117电信东形卡（仅发广东）","operator":"电信","price":39,"general":140,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广东"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；仅发广东；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"电信东形卡","rawName":"电信东形卡（仅发广东）","operator":"电信","price":39,"general":140,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广东"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；仅发广东；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通庆枝卡","rawName":"联通庆枝卡（仅发重庆）","operator":"联通","price":39,"general":200,"direct":0,"call":300,"ageMin":18,"ageMax":60,"province":["重庆"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发重庆；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通川域卡","rawName":"联通川域卡（仅发四川）","operator":"联通","price":39,"general":550,"direct":0,"call":300,"ageMin":18,"ageMax":30,"province":["四川"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-30；上门激活；仅发四川；会员N选1；次月生效","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通川雅卡","rawName":"联通川雅卡（仅发四川）","operator":"联通","price":39,"general":240,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["四川"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发四川","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通浅眠卡（高龄版本）","rawName":"联通浅眠卡（高龄版本）","operator":"联通","price":40,"general":290,"direct":0,"call":200,"ageMin":30,"ageMax":60,"province":["河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","山东","湖北","湖南","广西","海南","重庆","四川","贵州","甘肃","青海","宁夏"],"firstRecharge":"50元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"30-60；激活发货；全国可发；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通浅眠卡","rawName":"联通浅眠卡（激活发货）","operator":"联通","price":40,"general":290,"direct":0,"call":200,"ageMin":18,"ageMax":30,"province":["河北","山西","内蒙古","上海","江苏","浙江","安徽","福建","山东","湖北","湖南","广西","海南","重庆","四川","贵州","甘肃","青海","宁夏"],"firstRecharge":"50元","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-30；激活发货；全国可发；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"电信山涧卡","rawName":"电信山涧卡（仅发山东）","operator":"电信","price":40,"general":310,"direct":0,"call":200,"ageMin":18,"ageMax":60,"province":["山东"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发山东；部分市区","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"广电奔贺卡","rawName":"广电奔贺卡（仅发河南）","operator":"广电","price":41,"general":200,"direct":0,"call":0,"ageMin":18,"ageMax":60,"province":["河南"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；上门激活；仅发河南；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"电信东茗卡","rawName":"电信东茗卡（仅发广东）","operator":"电信","price":49,"general":170,"direct":0,"call":0,"ageMin":18,"ageMax":65,"province":["广东"],"firstRecharge":"激活时充","commissionLevel":1,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-65；上门激活；仅发广东；仅限私域","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通听松卡","rawName":"联通听松卡（激活发货）","operator":"联通","price":29,"general":130,"direct":0,"call":200,"ageMin":18,"ageMax":27,"province":["全网"],"firstRecharge":"200元","commissionLevel":2,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-27；激活发货；全国可发；会员N选1","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"移动胜途卡","rawName":"移动胜途卡（激活发货）","operator":"移动","price":39,"general":200,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["全网"],"firstRecharge":"240元","commissionLevel":2,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；激活发货；全国可发；需改IP","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"移动微光卡","rawName":"移动微光卡（激活发货）","operator":"移动","price":40,"general":300,"direct":0,"call":100,"ageMin":18,"ageMax":60,"province":["全网"],"firstRecharge":"250元","commissionLevel":2,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-60；激活发货；全国可发；NFC1对1","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通青苹卡","rawName":"联通青苹卡（激活发货）","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["全网"],"firstRecharge":"激活时充","commissionLevel":3,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-28；激活发货；全国可发；长期流量；1年会员","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"},{"name":"联通青峰卡","rawName":"联通青峰卡（激活发货）","operator":"联通","price":39,"general":150,"direct":0,"call":200,"ageMin":18,"ageMax":28,"province":["全网"],"firstRecharge":"激活时充","commissionLevel":3,"channel":"号卡宇宙","activate":"快递员/上门激活","note":"18-28；激活发货；全国可发；会员N选1","link":"https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"}];
+let tab = "flow";
+let prov = "";
+let ops = ["移动","联通","电信","广电"];
+let chans = [];
+let WXID = localStorage.getItem("yj_wxid") || "";
 
-const DATA_URL = "cards.json";
-let CARD_DATA = [];
-let userProvince = localStorage.getItem("hk_province") || "";
-let dataFromNet = false;
-/* 支持分享链接带省份，如 index.html?p=广东 */
-const urlProv = new URLSearchParams(location.search).get("p");
-if(urlProv && PROVINCES.includes(urlProv)) userProvince = urlProv;
-
-/* ---------- 数据加载 ---------- */
-async function loadData(){
-  try{
-    const res = await fetch(DATA_URL + "?t=" + Date.now(), {cache:"no-store"});
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    const d = await res.json();
-    if(!Array.isArray(d) || !d.length) throw new Error("空数据");
-    CARD_DATA = d; dataFromNet = true;
-    setStatus("已同步最新 · " + d.length + "款");
-  }catch(e){
-    CARD_DATA = DEFAULT_DATA; dataFromNet = false;
-    setStatus("离线快照 · " + DEFAULT_DATA.length + "款");
-  }
-  initProvinceSelect();
-  render();
-}
-function setStatus(t){ document.getElementById("dataStatus").textContent = t; }
-
-/* ---------- 省份选择 ---------- */
-function initProvinceSelect(){
-  const sel = document.getElementById("provinceSelect");
-  sel.innerHTML = '<option value="">全国 / 全部省份</option>' +
+/* ---------- 初始化 ---------- */
+function initSelect(){
+  const sel = document.getElementById("prov");
+  sel.innerHTML = '<option value="">全部省份（不筛）</option>' +
     PROVINCES.map(p => `<option value="${p}">${p}</option>`).join("");
-  if(userProvince && PROVINCES.includes(userProvince)){
-    sel.value = userProvince;
-    document.getElementById("locBtn").classList.add("on");
-  }
-  sel.addEventListener("change", ()=>{
-    userProvince = sel.value;
-    localStorage.setItem("hk_province", userProvince);
-    document.getElementById("locBtn").classList.remove("on");
-    render();
+}
+
+function initChannels(){
+  const cnt = {};
+  DATA.forEach(c => cnt[c.channel] = (cnt[c.channel]||0)+1);
+  const order = ["卡世界","172","宸宇","号卡宇宙","浩卡联盟"];
+  const box = document.getElementById("chans");
+  box.innerHTML = order.filter(c => cnt[c]).map(c =>
+    `<div class="chan" data-c="${c}">${c}<b>${cnt[c]}</b></div>`).join("");
+  box.querySelectorAll(".chan").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const c = el.dataset.c;
+      if(chans.includes(c)) { chans = chans.filter(x=>x!==c); el.classList.remove("on"); }
+      else { chans.push(c); el.classList.add("on"); }
+      render();
+    });
   });
 }
 
 /* ---------- 定位 ---------- */
-const EN2CN = {beijing:"北京",tianjin:"天津",hebei:"河北",shanxi:"山西",inner:"内蒙古",liaoning:"辽宁",jilin:"吉林",heilongjiang:"黑龙江",shanghai:"上海",jiangsu:"江苏",zhejiang:"浙江",anhui:"安徽",fujian:"福建",jiangxi:"江西",shandong:"山东",henan:"河南",hubei:"湖北",hunan:"湖南",guangdong:"广东",guangxi:"广西",hainan:"海南",chongqing:"重庆",sichuan:"四川",guizhou:"贵州",yunnan:"云南",xizang:"西藏",tibet:"西藏",shaanxi:"陕西",gansu:"甘肃",qinghai:"青海",ningxia:"宁夏",xinjiang:"新疆"};
-
-async function locate(){
-  const btn = document.getElementById("locBtn");
-  btn.textContent = "定位中…";
-
-  // 方式1：IP 定位（无需权限，最快）
-  try{
-    const r = await fetch("https://ipwho.is/", {cache:"no-store"});
-    const j = await r.json();
-    if(j && j.success !== false && j.country_code === "CN" && j.region){
-      const p = matchProvince(j.region + " " + (j.city||""));
-      if(p) return applyLocated(p, "IP定位");
-    }
-  }catch(e){}
-
-  // 方式2：浏览器定位 + 逆地理编码
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(async pos=>{
-      try{
-        const {latitude:lat, longitude:lon} = pos.coords;
-        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=zh-CN&zoom=10`, {headers:{"Accept":"application/json"}});
-        const j = await r.json();
-        const p = matchProvince(JSON.stringify(j.address || {}) + " " + (j.display_name||""));
-        if(p) return applyLocated(p, "GPS定位");
-      }catch(e){}
-      failLocate();
-    }, ()=>failLocate(), {timeout:12000, maximumAge:600000});
-  }else{
-    failLocate();
-  }
-}
-
-function matchProvince(text){
-  const cn = PROVINCES.find(p => text.includes(p));
-  if(cn) return cn;
-  const low = text.toLowerCase();
-  for(const k in EN2CN){ if(low.includes(k)) return EN2CN[k]; }
-  return "";
-}
-
-function applyLocated(p, way){
-  const sel = document.getElementById("provinceSelect");
-  sel.value = p;
-  userProvince = p;
-  localStorage.setItem("hk_province", p);
-  const btn = document.getElementById("locBtn");
-  btn.textContent = "本省：" + p;
-  btn.classList.add("on");
-  render();
-  if(way) setStatus(way + " · 本省优先");
-}
-
-function failLocate(){
-  const btn = document.getElementById("locBtn");
-  btn.textContent = "定位本省";
-  btn.classList.remove("on");
-  alert("定位失败，请直接在下拉框选择你所在省份");
-}
-
-/* ---------- 渲染 ---------- */
-function updatePriceLabel(){
-  const v = parseInt(document.getElementById("priceRange").value);
-  document.getElementById("priceLabel").textContent = v >= 99 ? "不限" : v + "元";
+function setLoc(p){
+  prov = p;
+  document.getElementById("prov").value = p;
+  const b = document.getElementById("locBtn");
+  b.textContent = "本省·" + p;
+  b.classList.remove("off");
   render();
 }
 
-function provWeight(card, prov){
-  if(!prov) return 1;
-  if(card.province.includes(prov)) return 0;
-  if(card.province.includes("全网")) return 1;
-  return 2;
+function locate(){
+  const btn = document.getElementById("locBtn");
+  btn.textContent = "定位中";
+  const done = p => { if(p){ setLoc(p); } else { btn.textContent = "定位"; btn.classList.add("off"); toast("定位失败，请在省份下拉里手动选择"); } };
+
+  if(!navigator.geolocation && !window.fetch){ return done(""); }
+  // 优先 IP 定位（无需授权，最快）
+  fetch("https://ipwho.is/", {cache:"no-store"}).then(r=>r.json()).then(j=>{
+    if(j && j.country_code === "CN" && j.region){ done(matchProv(j.region + (j.city||""))); }
+    else geoLocate(done);
+  }).catch(()=> geoLocate(done));
 }
 
-function flowText(c){
-  const total = (c.general||0) + (c.direct||0);
-  return total ? total + "<small>G</small>" : "—";
+function geoLocate(done){
+  if(!navigator.geolocation) return done("");
+  navigator.geolocation.getCurrentPosition(pos=>{
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&accept-language=zh-CN`)
+      .then(r=>r.json())
+      .then(j=>done(matchProv((j.address && JSON.stringify(j.address) || "") + (j.display_name||""))))
+      .catch(()=>done(""));
+  }, ()=>done(""), {timeout:12000, maximumAge:600000});
+}
+
+function matchProv(t){
+  const hit = PROVINCES.find(p=>t.includes(p));
+  return hit || "";
+}
+
+function clearAge(){ document.getElementById("age").value = ""; render(); }
+
+/* ---------- 筛选 ---------- */
+function inProv(c){
+  if(!prov) return true;
+  return c.province.includes("全网") || c.province.includes(prov);
 }
 
 function render(){
-  const q = document.getElementById("searchInput").value.trim().toLowerCase();
-  const prov = document.getElementById("provinceSelect").value;
-  const op = document.getElementById("operatorSelect").value;
-  const maxPrice = parseInt(document.getElementById("priceRange").value);
-  const list = document.getElementById("list");
+  const age = parseInt(document.getElementById("age").value) || 0;
+  const maxPrice = parseInt(document.getElementById("price").value);
+  const q = document.getElementById("q").value.trim().toLowerCase();
 
-  let rows = CARD_DATA.filter(c=>{
-    if(prov && !(c.province.includes(prov) || c.province.includes("全网"))) return false; // 外省卡不显示
-    if(maxPrice < 99 && c.price > maxPrice) return false;
-    if(op && c.operator !== op) return false;
+  let rows = DATA.filter(c=>{
+    if(tab === "flow" && c.type !== "流量卡") return false;
+    if(tab === "broadband" && c.type !== "宽带") return false;
+    if(!inProv(c)) return false;
+    if(age && (age < c.ageMin || age > c.ageMax)) return false;
+    if(ops.length && !ops.includes(c.operator)) return false;
+    if(chans.length && !chans.includes(c.channel)) return false;
+    if(maxPrice < 100 && c.price > maxPrice) return false;
     if(q){
-      const hay = [c.name, c.rawName||"", c.operator, c.channel, c.note, c.firstRecharge].join(" ").toLowerCase();
-      if(!hay.includes(q)) return false;
+      const s = (c.name + c.operator + c.channel + c.note + c.province.join("")).toLowerCase();
+      if(!s.includes(q)) return false;
     }
     return true;
   });
 
   rows.sort((a,b)=>{
-    const wa = provWeight(a, prov), wb = provWeight(b, prov);
+    const wa = prov && a.province.includes(prov) ? 0 : (a.province.includes("全网") ? 1 : 2);
+    const wb = prov && b.province.includes(prov) ? 0 : (b.province.includes("全网") ? 1 : 2);
     if(wa !== wb) return wa - wb;
-    if((a.commissionLevel||3) !== (b.commissionLevel||3)) return (a.commissionLevel||3) - (b.commissionLevel||3);
+    if(a.commissionLevel !== b.commissionLevel) return a.commissionLevel - b.commissionLevel;
     if(a.price !== b.price) return a.price - b.price;
-    return ((b.general+b.direct)||0) - ((a.general+a.direct)||0);
+    return (b.general + b.direct) - (a.general + a.direct);
   });
 
-  // 顶部统计
-  const sm = document.getElementById("summary");
+  const tip = document.getElementById("tip");
   if(prov){
-    const local = rows.filter(c=>c.province.includes(prov)).length;
+    const mine = rows.filter(c=>c.province.includes(prov)).length;
     const nat = rows.filter(c=>!c.province.includes(prov) && c.province.includes("全网")).length;
-    sm.innerHTML = `📍 <b>${prov}</b>：本省专属 <b>${local}</b> 款 · 全国可发 <b>${nat}</b> 款 · 外省卡已隐藏`;
+    tip.textContent = `${prov}：本省专属 ${mine} 款 · 全国可发 ${nat} 款 · 外省卡已隐藏`;
   }else{
-    sm.innerHTML = `共 <b>${rows.length}</b> 款在售卡品，选择省份后自动把本省卡置顶`;
+    tip.textContent = `共 ${rows.length} 款在售，选择省份后本省卡自动置顶`;
   }
 
+  const list = document.getElementById("list");
   if(!rows.length){
-    list.innerHTML = `<div class="empty"><span class="big">🔍</span>没有符合条件的卡品<br>换个省份或放宽筛选条件试试</div>`;
+    list.innerHTML = '<div class="empty"><span class="big">🔍</span>没有符合条件的卡品<br>换个省份或放宽筛选条件试试</div>';
     return;
   }
 
   list.innerHTML = rows.map(c=>{
-    const isLocal = prov && c.province.includes(prov);
-    const isNat = c.province.includes("全网");
-    const badge = isLocal ? (c.province.length <= 3 ? `<span class="badge local">${prov}专属</span>` : `<span class="badge local">含${prov}</span>`)
-                : isNat ? `<span class="badge nation">全国可发</span>`
-                : `<span class="badge partial">限${c.province.length}省</span>`;
-    const ship = isNat ? "全国" : c.province.length <= 2 ? c.province.join("、") : `${c.province.length}省`;
+    const mine = prov && c.province.includes(prov);
+    const nat = c.province.includes("全网");
+    const bd = mine
+      ? `<span class="bd mine">${prov}${c.province.length<=3?'专属':'可发'}</span>`
+      : nat ? `<span class="bd nat">全国可发</span>`
+      : `<span class="bd part">限${c.province.length}省</span>`;
+    const ship = nat ? "全国"
+      : (mine ? (c.province.length<=2 ? c.province.join("、") : prov+"等"+c.province.length+"省")
+              : (c.province.length<=2 ? c.province.join("、") : c.province.length+"省"));
     const total = (c.general||0)+(c.direct||0);
+    const flow = total ? total + "<small>G</small>" : "—";
+    const call = c.call ? c.call + "<small>分</small>" : "—";
     return `
-    <div class="card${isLocal?' local':''}">
-      <div class="name-row">
-        <div class="card-name">${c.name}</div>
-        ${badge}
-        <span class="badge op">${c.operator}</span>
+    <div class="card${mine?' mine':''}">
+      <div class="nameRow">
+        <div class="name">${c.name}</div>
+        ${bd}
+        <span class="bd op">${c.operator}</span>
       </div>
-      <div class="highlight">
-        <div class="hl"><div class="num price">${c.price}<small>元</small></div><div class="label">月租</div></div>
-        <div class="hl"><div class="num flow">${flowText(c)}</div><div class="label">总流量</div></div>
-        <div class="hl"><div class="num call">${c.call ? c.call+"<small>分</small>" : "—"}</div><div class="label">通话</div></div>
+      <div class="hl">
+        <div><div class="n p">${c.price}<small>元</small></div><div class="l">月租</div></div>
+        <div><div class="n f">${flow}</div><div class="l">总流量</div></div>
+        <div><div class="n c">${call}</div><div class="l">通话</div></div>
       </div>
-      <div class="info-row">
-        <div class="info-chip${isLocal?' local-chip':''}"><span class="k">可发</span><span class="v">${ship}</span></div>
-        <div class="info-chip"><span class="k">年龄</span><span class="v">${c.ageMin}-${c.ageMax}岁</span></div>
-        <div class="info-chip"><span class="k">首充</span><span class="v">${c.firstRecharge}</span></div>
+      <div class="info">
+        <div class="chip${mine?' mine':''}"><div class="ck">可发</div><div class="cv">${ship}</div></div>
+        <div class="chip"><div class="ck">年龄</div><div class="cv">${c.ageMin}-${c.ageMax}岁</div></div>
+        <div class="chip"><div class="ck">首充</div><div class="cv">${c.firstRecharge}</div></div>
       </div>
       ${c.note ? `<div class="note">${c.note}</div>` : ""}
       <div class="foot">
-        <div class="act">激活方式：<b>${c.activate}</b><br>渠道：${c.channel}</div>
-        <a class="go" href="${c.link||'#'}" target="_blank" rel="noopener">去办理</a>
+        <div class="act">渠道：<b>${c.channel}</b><br>${c.photo === "是" ? "需传照片" : "免照片"}</div>
+        <button class="wxBtn" onclick="addWeChat('${c.name.replace(/'/g,"")}')">微信办理</button>
       </div>
     </div>`;
   }).join("");
 }
 
-/* ---------- 事件 ---------- */
-document.getElementById("searchInput").addEventListener("input", render);
-document.getElementById("operatorSelect").addEventListener("change", render);
-document.getElementById("priceRange").addEventListener("input", updatePriceLabel);
+/* ---------- 微信 ---------- */
+function addWeChat(cardName){
+  if(!WXID){
+    const v = prompt("首次使用：请输入你的客服微信号（只需设置一次，之后点按钮直接跳转微信）");
+    if(!v || !v.trim()) return;
+    WXID = v.trim();
+    localStorage.setItem("yj_wxid", WXID);
+  }
+  const text = `我想办理：${cardName}（来自有佳卡精选助手）`;
+  // 1. 复制微信号 2. 尝试唤起微信
+  copyText(WXID).then(()=>{
+    toast(`微信号「${WXID}」已复制<br>正在打开微信，粘贴搜索即可添加`);
+    setTimeout(()=>{ location.href = "weixin://"; }, 600);
+  }).catch(()=>{
+    toast(`请手动添加微信号：${WXID}`);
+  });
+}
 
-loadData();
+function copyText(t){
+  if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+  return new Promise((res,rej)=>{
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = t; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      ok ? res() : rej();
+    }catch(e){ rej(e); }
+  });
+}
+
+let toastTimer = null;
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.innerHTML = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.classList.remove("show"), 2600);
+}
+
+/* ---------- 事件 ---------- */
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+    t.classList.add("on");
+    tab = t.dataset.tab;
+    render();
+  });
+});
+
+document.getElementById("ops").addEventListener("click", e=>{
+  const el = e.target.closest(".op");
+  if(!el) return;
+  const op = el.dataset.op;
+  if(ops.includes(op)){
+    if(ops.length === 1) return;  // 至少保留一个
+    ops = ops.filter(x=>x!==op); el.classList.remove("on");
+  }else{ ops.push(op); el.classList.add("on"); }
+  render();
+});
+
+document.getElementById("prov").addEventListener("change", e=>{
+  prov = e.target.value;
+  const b = document.getElementById("locBtn");
+  if(prov){ b.textContent = "本省·"+prov; b.classList.remove("off"); }
+  else { b.textContent = "定位"; b.classList.add("off"); }
+  render();
+});
+
+document.getElementById("age").addEventListener("input", render);
+document.getElementById("q").addEventListener("input", render);
+document.getElementById("price").addEventListener("input", e=>{
+  document.getElementById("pv").textContent = (e.target.value >= 100 ? "≤100元" : "≤" + e.target.value + "元");
+  render();
+});
+
+/* ---------- 启动 ---------- */
+initSelect();
+initChannels();
+render();
 </script>
 </body>
 </html>
