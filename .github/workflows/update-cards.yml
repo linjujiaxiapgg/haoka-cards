@@ -1,0 +1,30 @@
+name: 自动更新号卡数据
+
+on:
+  schedule:
+    # 每 6 小时自动抓一次（UTC 时间，对应北京时间 08/14/20/02 点）
+    - cron: "0 0,6,12,18 * * *"
+  workflow_dispatch:        # 也可以在 Actions 页面手动点一下立即更新
+
+permissions:
+  contents: write           # 允许把最新 cards.json 提交回仓库
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 抓取最新卡品数据
+        run: python scraper.py
+
+      - name: 提交更新
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "自动更新 cards.json"
+          file_pattern: cards.json
