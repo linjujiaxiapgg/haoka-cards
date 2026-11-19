@@ -1118,6 +1118,28 @@
   "link": "https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"
  },
  {
+  "id": "1454",
+  "name": "移动东羽卡",
+  "rawName": "移动东羽卡（仅发广东）",
+  "operator": "移动",
+  "price": 39,
+  "general": 155,
+  "direct": 0,
+  "call": 0,
+  "ageMin": 18,
+  "ageMax": 65,
+  "tag": "18-65；上门激活；仅发广东；激活选号",
+  "province": [
+   "广东"
+  ],
+  "firstRecharge": "激活时充",
+  "commissionLevel": 1,
+  "channel": "号卡宇宙",
+  "activate": "快递员/上门激活",
+  "note": "18-65；上门激活；仅发广东；激活选号",
+  "link": "https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9"
+ },
+ {
   "id": "1453",
   "name": "联通东烈卡",
   "rawName": "联通东烈卡（仅发广东）",
