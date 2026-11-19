@@ -84,12 +84,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:11px;border-top:1px solid var(--line)}
 .act{flex:1;min-width:0;font-size:11.5px;color:var(--sub);line-height:1.5}
 .act b{color:#7f8ca0;font-weight:600}
-.wxBtn{flex:0 0 auto;padding:10px 18px;border:none;border-radius:24px;background:linear-gradient(135deg,#1aad19,#0f8f0e);color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 5px 14px rgba(26,173,25,.28);display:flex;align-items:center;gap:5px}
-.wxBtn:active{transform:scale(.97)}
-.linkRow{display:flex;gap:8px;margin-top:9px}
-.lkBtn{flex:1;padding:9px 0;text-align:center;border-radius:10px;background:var(--panel2);border:1px solid var(--line);color:#9aa4b8;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s}
-.lkBtn:active{transform:scale(.97)}
-.lkBtn.hi{color:var(--primary2);border-color:rgba(123,97,255,.4);background:rgba(123,97,255,.12)}
+.btnRow{display:flex;gap:8px;flex:0 0 auto}
+.btnShare,.btnApply{padding:10px 16px;border:none;border-radius:22px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s}
+.btnShare{background:var(--panel2);color:#b9c1d1;border:1px solid var(--line)}
+.btnApply{background:linear-gradient(135deg,#2d6bff,#3f8dff);color:#fff;box-shadow:0 5px 14px rgba(45,107,255,.28);padding:10px 20px}
+.btnShare:active,.btnApply:active{transform:scale(.97)}
 .card.focus{box-shadow:0 0 0 2px rgba(123,97,255,.55),0 10px 30px rgba(123,97,255,.18);border-color:rgba(123,97,255,.5)}
 .empty{text-align:center;padding:60px 24px;color:var(--sub);font-size:13.5px;line-height:1.9}
 .empty .big{font-size:38px;display:block;margin-bottom:10px;opacity:.4}
@@ -333,11 +332,10 @@ function render(){
       ${c.note ? `<div class="note">${c.note}</div>` : ""}
       <div class="foot">
         <div class="act">渠道：<b>${c.channel}</b><br>${c.photo === "是" ? "需传照片" : "免照片"}</div>
-        <button class="wxBtn" onclick="addWeChat('${c.name.replace(/'/g,"")}')">微信办理</button>
-      </div>
-      <div class="linkRow">
-        <div class="lkBtn" onclick="copyCard('${cid}')">复制链接</div>
-        <div class="lkBtn hi" onclick="shareCard('${cid}')">分享这张卡</div>
+        <div class="btnRow">
+          <button class="btnShare" onclick="shareCard('${cid}')">分享</button>
+          <button class="btnApply" onclick="applyCard('${cid}')">立即办理</button>
+        </div>
       </div>
     </div>`;
   }).join("");
@@ -350,26 +348,44 @@ function cardUrl(id){
   return location.href.split("#")[0].split("?")[0] + "?c=" + id;
 }
 
-function copyCard(id){
-  const c = findCard(id); if(!c) return;
+const CHANNEL_SHOP = {
+  "卡世界": "https://ym.ksjhaoka.com/?s=8jvwksIk729389",
+  "172": "https://web.haokalingqu.com/home/252120281e6bb2ed",
+  "宸宇": "https://yc.670k.com/index?k=M0RwUklOampLTDg9",
+  "号卡宇宙": "https://hk.198haoka.cn/index?k=WHFBNWFnV25wVGM9",
+  "浩卡联盟": "https://www.haokaxinyao.com/#/pages/sales_index/my_store?mall_id=K5Ah0dP8jpS7b0RInLSmkQ%3D%3D"
+};
+
+function cardText(c){
   const g = (c.general||0)+(c.direct||0);
   const area = c.province.includes("全网") ? "全国" : c.province.join("、");
-  const txt = `【${c.name}】${c.price}元/${g}G/${c.call ? c.call+"分钟" : "无通话"}｜可发：${area}｜年龄：${c.ageMin}-${c.ageMax}岁｜首充：${c.firstRecharge}｜加微信 ${WXID} 办理
-${cardUrl(id)}`;
-  copyText(txt).then(()=> toast("卡片信息和链接已复制<br>去微信直接粘贴发送给客户"))
+  return `【${c.name}】${c.price}元/月 ${g}G通用 ${c.call ? c.call+"分钟通话" : "无通话"}｜可发：${area}｜年龄：${c.ageMin}-${c.ageMax}岁｜首充：${c.firstRecharge}`;
+}
+
+function copyCard(id){
+  const c = findCard(id); if(!c) return;
+  const txt = cardText(c) + String.fromCharCode(10) + cardUrl(id);
+  copyText(txt).then(()=> toast("卡片信息和链接已复制<br>直接粘贴发送即可"))
                  .catch(()=> toast("复制失败，请手动选择文字复制"));
 }
 
 function shareCard(id){
   const c = findCard(id); if(!c) return;
-  const g = (c.general||0)+(c.direct||0);
-  const text = `【${c.name}】${c.price}元 ${g}G ${c.call ? c.call+"分钟" : "无通话"}，加微信 ${WXID} 办理`;
   const url = cardUrl(id);
+  const text = cardText(c);
   if(navigator.share){
-    navigator.share({title:c.name + "｜" + c.price + "元 " + g + "G", text, url}).catch(()=>{});
+    navigator.share({title: c.name + "｜" + c.price + "元 " + ((c.general||0)+(c.direct||0)) + "G", text, url}).catch(()=>{});
   }else{
     copyCard(id);
+    toast("当前浏览器不支持系统分享<br>已复制卡片信息和链接");
   }
+}
+
+function applyCard(id){
+  const c = findCard(id); if(!c) return;
+  const shop = CHANNEL_SHOP[c.channel];
+  if(shop){ window.open(shop, "_blank"); }
+  else { toast("该渠道暂无线上办理入口"); }
 }
 
 /* ---------- 微信 ---------- */
