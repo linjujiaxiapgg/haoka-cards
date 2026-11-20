@@ -98,6 +98,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .hd{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto}
 .chaChip{padding:6px 13px;border-radius:16px;background:rgba(123,97,255,.12);border:1px solid rgba(123,97,255,.42);color:var(--primary2);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
 .chaChip:active{transform:scale(.97)}
+/* 我的下单 */
+.ordTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#1b1f27;border-radius:12px;padding:4px;margin-bottom:12px}
+.ordTab{padding:9px 0;text-align:center;font-size:12px;font-weight:700;color:var(--sub);border-radius:9px;cursor:pointer}
+.ordTab.on{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+.ordSearch{display:flex;gap:8px;margin-bottom:10px}
+.ordSearch .inp{padding:10px 12px;font-size:12px}
+.ordQbtn{flex:0 0 auto;padding:10px 14px;border-radius:11px;background:var(--panel2);border:1px solid var(--line);color:var(--sub);font-size:11.5px;font-weight:700;cursor:pointer}
+.ordList2{max-height:47vh;overflow-y:auto;padding:0 2px}
+.ordCard{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:9px}
+.ocTop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ocTop b{font-size:13px;font-weight:800;color:var(--primary2);letter-spacing:.3px}
+.ocBadge{font-size:9.5px;font-weight:700;padding:3px 7px;border-radius:6px;white-space:nowrap}
+.ocBadge.ok{background:rgba(38,194,129,.15);color:var(--ok)}
+.ocBadge.wait{background:rgba(255,95,109,.13);color:#ff8a92}
+.ocName{font-size:12px;font-weight:700;margin-top:6px}
+.ocMeta{font-size:10px;color:var(--sub);margin-top:3px;line-height:1.5}
+.ocRow{display:flex;gap:7px;margin-top:9px}
+.ocInp{flex:1;min-width:0;padding:9px 11px;background:#141820;border:1px solid var(--line);border-radius:9px;color:var(--text);font-size:11.5px;outline:none}
+.ocBtn{flex:0 0 auto;padding:9px 14px;border-radius:9px;background:linear-gradient(135deg,#2d6bff,#3f8dff);color:#fff;font-size:11.5px;font-weight:700;cursor:pointer}
+.ocAct{display:flex;gap:16px;margin-top:10px;font-size:10px;color:var(--sub)}
+.ocAct span{cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.ocEmpty{text-align:center;color:var(--sub);font-size:11px;padding:20px 10px;line-height:1.7}
 /* 订单查询弹层 */
 .mask{position:fixed;inset:0;background:rgba(4,6,10,.62);opacity:0;pointer-events:none;transition:.22s;z-index:120;display:flex;align-items:flex-end;justify-content:center}
 .mask.show{opacity:1;pointer-events:auto}
@@ -200,33 +222,50 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheetBar"></div>
     <div class="sheetTitle">订单查询</div>
-    <div class="sheetSub">选择你下单的渠道，输入下单手机号即可查进度、撤单</div>
-      <a class="ordRow" href="https://hk.198haoka.cn/cha.php?k=WHFBNWFnV25wVGM9" target="_blank" rel="noopener">
-        <div class="ordIc">号</div>
-        <div class="ordTxt"><b>号卡宇宙</b><span>需 手机号 + 身份证号</span></div>
-        <div class="ordGo">›</div>
-      </a>
-      <a class="ordRow" href="https://web.haokalingqu.com/Search/Index" target="_blank" rel="noopener">
-        <div class="ordIc">1</div>
-        <div class="ordTxt"><b>172</b><span>需 手机号 + 滑块验证</span></div>
-        <div class="ordGo">›</div>
-      </a>
-      <a class="ordRow" href="https://www.haokaxinyao.com/#/pages/sales_index/orderSearchentrance?mode=bottom" target="_blank" rel="noopener">
-        <div class="ordIc">浩</div>
-        <div class="ordTxt"><b>浩卡联盟</b><span>需 收货人手机号</span></div>
-        <div class="ordGo">›</div>
-      </a>
-      <a class="ordRow" href="https://ym.ksjhaoka.com/pages/order/order?s=8jvwksIk729389" target="_blank" rel="noopener">
-        <div class="ordIc">卡</div>
-        <div class="ordTxt"><b>卡世界</b><span>需 手机号 + 身份证后6位</span></div>
-        <div class="ordGo">›</div>
-      </a>
-      <a class="ordRow" href="https://yc.670k.com/cha?k=M0RwUklOampLTDg9" target="_blank" rel="noopener">
-        <div class="ordIc">宸</div>
-        <div class="ordTxt"><b>宸宇</b><span>需 手机号 + 身份证号</span></div>
-        <div class="ordGo">›</div>
-      </a>
-    <div class="sheetTip">查询结果以渠道系统为准；查不到可直接点右上角微信找我</div>
+    <div class="ordTabs">
+      <div class="ordTab on" data-ot="mine" onclick="switchOrdTab('mine')">我的下单</div>
+      <div class="ordTab" data-ot="ch" onclick="switchOrdTab('ch')">渠道查单</div>
+    </div>
+
+    <div class="ordPane" id="ordMine">
+      <div class="ordSearch">
+        <input class="inp" type="text" id="ordQ" placeholder="输入站内单号 / 卡名 / 渠道" oninput="renderOrders()">
+        <div class="ordQbtn" onclick="renderOrders()">查询</div>
+      </div>
+      <div class="ordList2" id="ordList2"></div>
+      <div class="sheetTip">站内单号在点「立即办理」时自动生成（仅保存在本机）；在渠道下单成功后，把渠道单号填进记录，两号即可对照</div>
+    </div>
+
+    <div class="ordPane" id="ordCh" style="display:none">
+      <div class="sheetSub" style="margin:0 0 12px">选你下单的渠道，输入下单手机号查进度、撤单</div>
+        <a class="ordRow" href="https://hk.198haoka.cn/cha.php?k=WHFBNWFnV25wVGM9" target="_blank" rel="noopener">
+          <div class="ordIc">号</div>
+          <div class="ordTxt"><b>号卡宇宙</b><span>需 手机号 + 身份证号</span></div>
+          <div class="ordGo">›</div>
+        </a>
+        <a class="ordRow" href="https://web.haokalingqu.com/Search/Index" target="_blank" rel="noopener">
+          <div class="ordIc">1</div>
+          <div class="ordTxt"><b>172</b><span>需 手机号 + 滑块验证</span></div>
+          <div class="ordGo">›</div>
+        </a>
+        <a class="ordRow" href="https://www.haokaxinyao.com/#/pages/sales_index/orderSearchentrance?mode=bottom" target="_blank" rel="noopener">
+          <div class="ordIc">浩</div>
+          <div class="ordTxt"><b>浩卡联盟</b><span>需 收货人手机号</span></div>
+          <div class="ordGo">›</div>
+        </a>
+        <a class="ordRow" href="https://ym.ksjhaoka.com/pages/order/order?s=8jvwksIk729389" target="_blank" rel="noopener">
+          <div class="ordIc">卡</div>
+          <div class="ordTxt"><b>卡世界</b><span>需 手机号 + 身份证后6位</span></div>
+          <div class="ordGo">›</div>
+        </a>
+        <a class="ordRow" href="https://yc.670k.com/cha?k=M0RwUklOampLTDg9" target="_blank" rel="noopener">
+          <div class="ordIc">宸</div>
+          <div class="ordTxt"><b>宸宇</b><span>需 手机号 + 身份证号</span></div>
+          <div class="ordGo">›</div>
+        </a>
+      <div class="sheetTip">查询结果以渠道系统为准；查不到可直接点右上角微信找我</div>
+    </div>
+
     <button class="sheetBtn" onclick="closeOrderSheet()">取消</button>
   </div>
 </div>
@@ -442,14 +481,113 @@ function shareCard(id){
 
 function applyCard(id){
   const c = findCard(id); if(!c) return;
+  orders = loadOrders();
+  const no = createOrder(c);
+  copyText(no).catch(()=>{});
+  toast(`已生成站内单号 <b>${no}</b>（已复制）<br>渠道下单成功后，回「查单」填渠道单号`);
   if(c.buy){ window.open(c.buy, "_blank"); return; }
   const shop = CHANNEL_SHOP[c.channel];
   if(shop){ window.open(shop, "_blank"); }
   else { toast("该渠道暂无线上办理入口"); }
 }
 
+/* ---------- 我的下单 / 站内单号 ---------- */
+const ORDER_PORTALS = [
+  {ch:"号卡宇宙", url:"https://hk.198haoka.cn/cha.php?k=WHFBNWFnV25wVGM9"},
+  {ch:"172", url:"https://web.haokalingqu.com/Search/Index"},
+  {ch:"浩卡联盟", url:"https://www.haokaxinyao.com/#/pages/sales_index/orderSearchentrance?mode=bottom"},
+  {ch:"卡世界", url:"https://ym.ksjhaoka.com/pages/order/order?s=8jvwksIk729389"},
+  {ch:"宸宇", url:"https://yc.670k.com/cha?k=M0RwUklOampLTDg9"}
+];
+const OKEY = "yj_orders_v1";
+let orders = [];
+function loadOrders(){ try{ return JSON.parse(localStorage.getItem(OKEY) || "[]"); }catch(e){ return []; } }
+function saveOrders(a){ try{ localStorage.setItem(OKEY, JSON.stringify(a)); }catch(e){} }
+function todayStr(){ const d = new Date(); return `${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+
+function newOrderNo(){
+  const d = new Date();
+  const pre = "YJ" + String(d.getFullYear()).slice(2) + String(d.getMonth()+1).padStart(2,"0") + String(d.getDate()).padStart(2,"0");
+  const seq = orders.filter(o=>o.no.indexOf(pre)===0)
+                    .reduce((m,o)=>Math.max(m, parseInt((o.no.split("-")[1]||"0"),10)), 0) + 1;
+  return pre + "-" + String(seq).padStart(3,"0");
+}
+
+function createOrder(c){
+  // 同一张卡 90 秒内重复点击，复用原单号，避免刷屏
+  const last = orders.find(o=>o.cardId===c.id && Date.now()-o.ts < 90000);
+  if(last) return last.no;
+  const no = newOrderNo();
+  orders.unshift({no, cardId:c.id, name:c.name, channel:c.channel, buy:c.buy||"", ts:Date.now(), chNo:""});
+  saveOrders(orders);
+  return no;
+}
+
+function setChNo(no, v){
+  const o = orders.find(x=>x.no===no); if(!o) return;
+  o.chNo = (v||"").trim();
+  saveOrders(orders);
+  renderOrders();
+  if(o.chNo) toast(`已登记 ${no} → 渠道单号 ${o.chNo}`);
+}
+
+function delOrder(no){
+  if(!confirm(`删除站内单号 ${no} 的本地记录？`)) return;
+  orders = orders.filter(o=>o.no!==no);
+  saveOrders(orders); renderOrders();
+}
+
+function copyNo(no){
+  copyText(no).then(()=>toast(`单号 ${no} 已复制`)).catch(()=>toast(`请手动复制：${no}`));
+}
+
+function gotoQuery(channel){
+  const p = ORDER_PORTALS.find(x=>x.ch===channel);
+  if(p) window.open(p.url, "_blank");
+  else toast("该渠道暂无查单页");
+}
+
+function renderOrders(){
+  const box = document.getElementById("ordList2"); if(!box) return;
+  const q = (document.getElementById("ordQ").value || "").trim().toLowerCase();
+  const list = orders.filter(o=>{
+    if(!q) return true;
+    return (o.no + o.name + o.channel + (o.chNo||"")).toLowerCase().includes(q);
+  });
+  if(!list.length){
+    box.innerHTML = `<div class="ocEmpty">${orders.length ? "没有匹配的记录" : "还没有下单记录<br>点任意卡片的「立即办理」，这里会自动生成站内单号"}</div>`;
+    return;
+  }
+  box.innerHTML = list.map(o=>{
+    const d = new Date(o.ts);
+    const t = `${d.getMonth()+1}月${d.getDate()}日 ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+    const has = !!o.chNo;
+    return `
+    <div class="ordCard">
+      <div class="ocTop"><b>${o.no}</b><span class="ocBadge ${has?'ok':'wait'}">${has?'已登记渠道单号':'待回填渠道单号'}</span></div>
+      <div class="ocName">${o.name}</div>
+      <div class="ocMeta">渠道：${o.channel} · 下单于 ${t}</div>
+      <div class="ocRow">
+        <input class="ocInp" placeholder="渠道单号（下单成功后填）" value="${o.chNo||""}" onchange="setChNo('${o.no}', this.value)">
+        <div class="ocBtn" onclick="gotoQuery('${o.channel}')">查单</div>
+      </div>
+      <div class="ocAct"><span onclick="copyNo('${o.no}')">复制单号</span><span onclick="delOrder('${o.no}')">删除记录</span></div>
+    </div>`;
+  }).join("");
+}
+
+function switchOrdTab(t){
+  document.querySelectorAll(".ordTab").forEach(x=>x.classList.toggle("on", x.dataset.ot===t));
+  document.getElementById("ordMine").style.display = t==="mine" ? "" : "none";
+  document.getElementById("ordCh").style.display = t==="ch" ? "" : "none";
+  if(t==="mine") renderOrders();
+}
+
 /* ---------- 订单查询 ---------- */
 function openOrderSheet(){
+  orders = loadOrders();
+  renderOrders();
+  switchOrdTab("mine");
   const m = document.getElementById("ordMask");
   m.classList.add("show");
   document.body.style.overflow = "hidden";
@@ -540,6 +678,7 @@ document.getElementById("price").addEventListener("input", e=>{
 });
 
 /* ---------- 启动 ---------- */
+orders = loadOrders();
 initSelect();
 initChannels();
 
