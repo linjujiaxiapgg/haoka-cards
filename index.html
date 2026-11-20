@@ -94,6 +94,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .empty .big{font-size:36px;display:block;margin-bottom:10px;opacity:.4}
 .loading{text-align:center;padding:50px;color:var(--sub);font-size:11.5px}
 .footNote{text-align:center;font-size:10px;color:#6f7889;padding:20px 18px 4px;line-height:1.9}
+/* 头部动作区 */
+.hd{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto}
+.chaChip{padding:6px 13px;border-radius:16px;background:rgba(123,97,255,.12);border:1px solid rgba(123,97,255,.42);color:var(--primary2);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.chaChip:active{transform:scale(.97)}
+/* 订单查询弹层 */
+.mask{position:fixed;inset:0;background:rgba(4,6,10,.62);opacity:0;pointer-events:none;transition:.22s;z-index:120;display:flex;align-items:flex-end;justify-content:center}
+.mask.show{opacity:1;pointer-events:auto}
+.sheet{width:100%;max-width:560px;background:#15181f;border-radius:20px 20px 0 0;padding:10px 16px 24px;transform:translateY(40px);transition:.24s;border-top:1px solid rgba(255,255,255,.08)}
+.mask.show .sheet{transform:translateY(0)}
+.sheetBar{width:38px;height:4px;border-radius:3px;background:rgba(255,255,255,.16);margin:0 auto 12px}
+.sheetTitle{font-size:16px;font-weight:800;text-align:center}
+.sheetSub{font-size:10.5px;color:var(--sub);text-align:center;margin:6px 0 14px;line-height:1.65}
+.ordRow{display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;margin-bottom:9px;text-decoration:none;color:inherit}
+.ordRow:active{transform:scale(.99)}
+.ordIc{width:30px;height:30px;flex:0 0 30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary2))}
+.ordTxt{flex:1;min-width:0}
+.ordTxt b{font-size:13px;font-weight:800;display:block}
+.ordTxt span{font-size:10px;color:var(--sub);display:block;margin-top:2px}
+.ordGo{font-size:15px;color:var(--sub);flex:0 0 auto}
+.sheetTip{font-size:10px;color:#6f7889;text-align:center;line-height:1.65;margin:6px 0 12px}
+.sheetBtn{width:100%;padding:12px 0;border-radius:12px;border:1px solid var(--line);background:#1c2029;color:var(--sub);font-size:12px;font-weight:700;cursor:pointer}
 /* toast */
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%) translateY(20px);background:rgba(24,27,34,.96);border:1px solid var(--line);color:#e9ecf1;padding:12px 18px;border-radius:12px;font-size:11.5px;line-height:1.5;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:86%;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -109,7 +130,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
         <div class="sub">可发地区 · 年龄 · 月租 一键筛</div>
       </div>
     </div>
-    <div class="wxChip" id="wxChip" onclick="openWx()">加微信<br><b>yjk16889898</b></div>
+    <div class="hd">
+      <div class="chaChip" onclick="openOrderSheet()">查单</div>
+      <div class="wxChip" id="wxChip" onclick="openWx()">加微信<br><b>yjk16889898</b></div>
+    </div>
   </div>
 
   <div class="tabs">
@@ -171,6 +195,40 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <div class="tip" id="tip"></div>
   <div class="list" id="list"><div class="loading">正在载入本地卡品数据…</div></div>
   <div class="footNote">本地数据 · 无需联网<br>套餐与审核以运营商及渠道最终结果为准</div>
+</div>
+<div class="mask" id="ordMask" onclick="closeOrderSheet(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheetBar"></div>
+    <div class="sheetTitle">订单查询</div>
+    <div class="sheetSub">选择你下单的渠道，输入下单手机号即可查进度、撤单</div>
+      <a class="ordRow" href="https://hk.198haoka.cn/cha.php?k=WHFBNWFnV25wVGM9" target="_blank" rel="noopener">
+        <div class="ordIc">号</div>
+        <div class="ordTxt"><b>号卡宇宙</b><span>需 手机号 + 身份证号</span></div>
+        <div class="ordGo">›</div>
+      </a>
+      <a class="ordRow" href="https://web.haokalingqu.com/Search/Index" target="_blank" rel="noopener">
+        <div class="ordIc">1</div>
+        <div class="ordTxt"><b>172</b><span>需 手机号 + 滑块验证</span></div>
+        <div class="ordGo">›</div>
+      </a>
+      <a class="ordRow" href="https://www.haokaxinyao.com/#/pages/sales_index/orderSearchentrance?mode=bottom" target="_blank" rel="noopener">
+        <div class="ordIc">浩</div>
+        <div class="ordTxt"><b>浩卡联盟</b><span>需 收货人手机号</span></div>
+        <div class="ordGo">›</div>
+      </a>
+      <a class="ordRow" href="https://ym.ksjhaoka.com/pages/order/order?s=8jvwksIk729389" target="_blank" rel="noopener">
+        <div class="ordIc">卡</div>
+        <div class="ordTxt"><b>卡世界</b><span>需 手机号 + 身份证后6位</span></div>
+        <div class="ordGo">›</div>
+      </a>
+      <a class="ordRow" href="https://yc.670k.com/cha?k=M0RwUklOampLTDg9" target="_blank" rel="noopener">
+        <div class="ordIc">宸</div>
+        <div class="ordTxt"><b>宸宇</b><span>需 手机号 + 身份证号</span></div>
+        <div class="ordGo">›</div>
+      </a>
+    <div class="sheetTip">查询结果以渠道系统为准；查不到可直接点右上角微信找我</div>
+    <button class="sheetBtn" onclick="closeOrderSheet()">取消</button>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -388,6 +446,19 @@ function applyCard(id){
   const shop = CHANNEL_SHOP[c.channel];
   if(shop){ window.open(shop, "_blank"); }
   else { toast("该渠道暂无线上办理入口"); }
+}
+
+/* ---------- 订单查询 ---------- */
+function openOrderSheet(){
+  const m = document.getElementById("ordMask");
+  m.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+function closeOrderSheet(e){
+  if(e && e.target && e.target.closest && e.target.closest(".sheet")) return;
+  const m = document.getElementById("ordMask");
+  m.classList.remove("show");
+  document.body.style.overflow = "";
 }
 
 /* ---------- 微信 ---------- */
